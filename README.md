@@ -5,7 +5,7 @@
 Cкачать проект в локальную директорию. В текущей директории будет создана папка `test_case_simbirsoft`
 
 ```bash
-git clone https://github.com/jugern/test_case_simbirsoft.git
+git clone https://github.com/Jugern/Pytest-Selenium-Allure.git
 ```
 
 ### Пункт 2.
@@ -25,12 +25,12 @@ ___
 потом обновить pip и установить зависимости:
 #### <br>на windows
 ```bash
-python -m venv venv & .venv\Scripts\activate & pip install 
+python -m venv venv & .venv\Scripts\activate & pip install &
 python -m pip install –upgrade pip & pip install -r requirements.txt
 ```
 #### на linux 
 ```bash
-python3 -m venv .venv && source ./venv/bin/activate
+python3 -m venv .venv && source ./venv/bin/activate &&
 pip3 install --upgrade pip && pip install -r requirements.txt
 ```
 #### Настраиваем конфигурацию тестов<a id='config'></a>
