@@ -1,0 +1,11 @@
+#patch
+venv
+__pycache__
+.github
+.pytest_cache
+allure-reports
+allure-results
+
+#file
+#.env
+transactions.csv
