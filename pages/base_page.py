@@ -59,7 +59,7 @@ class BasePage:
             else:
                 i = 0
 
-    def converting_table(self) -> list(Any):
+    def converting_table(self) -> list():
         # Метод для конвертации таблицы в список значений
         # Ожидаем:
         #   1 значение: дата, 2 значение: сумма, 3 значение: Дебит или Кредит
