@@ -15,7 +15,7 @@ if 'url_selenium_grid' in environ:
 elif 'port_selenium_grid' in environ:
     url_selenium_grid = 'selenium-hub'
     port_selenium_grid = environ.get('port_selenium_grid')
-    selector_selenium_grid = environ.get('selector')
+    selector_selenium_grid = '/wd/hub'
 else:
     load_dotenv()
     url_selenium_grid = getenv('url_selenium_grid')

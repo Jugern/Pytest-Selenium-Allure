@@ -1,15 +1,15 @@
 # Тестовое задание на вакансию Разработчик в тестировании.
 
 ### Установка
-### Пункт 1. 
+### Пункт 1.<a id='STEP_ONE'></a>
 Скачать проект в локальную директорию. В текущей директории будет создана папка `test_case_simbirsoft`
 
 ```bash
 git clone https://github.com/Jugern/Pytest-Selenium-Allure.git
 ```
 
-### Пункт 2.
-Перейдите в папку с проектом:<a id='STEP_TWO'></a>
+### Пункт 2.<a id='STEP_TWO'></a>
+Перейдите в папку с проектом:
 ```bash
 cd test_case_simbirsoft
 ```
@@ -42,10 +42,10 @@ sudo chmod +x ./wait-for-it.sh
 #### Настраиваем конфигурацию тестов<a id='config'></a>
 Открываем файл `.env` и прописываем параметры.
 ```dotenv
-number_test=1# кол-во random тестов (запускаются на Chrome, Edge, Firefox)
-url_selenium_grid=http://<ip-address># url адресс selenium grid  
-port_selenium_grid=:4444# порт selenium_grid
-selector=/wd/hub# адресная строка для selenium_grid
+number_test=1  # кол-во random тестов (запускаются на Chrome, Edge, Firefox)
+url_selenium_grid=http://<ip-address>  # url адресс selenium grid  
+port_selenium_grid=:4444  # порт selenium_grid
+selector=/wd/hub  # адресная строка для selenium_grid
 # все вместе получится 
 # http://<ip-address>:port/wd/hub
 ```
@@ -75,23 +75,23 @@ ___
 
 ### 3.2) Запуск тестов и создание отчетов будет локально, <br>selenium grid будет запускаться через Docker.<a id='step_3_2'></a>
  
-!!! Подразумевается что вы уже находитесь в папке с проектом. Если это не так, перейдите
-в [Пункт №2](#STEP_TWO) 
+!!! Подразумевается что вы уже находитесь в папке с проектом. Если это не так, выполните
+[Пункт1](#STEP_ONE) и [Пункт №2](#STEP_TWO) 
 
 Настраиваем файл `.env`.
 ```dotenv
-number_test=1# кол-во random тестов (запускаются на Chrome, Edge, Firefox)
-url_selenium_grid=http://<ip-address># url адресс selenium grid  
-port_selenium_grid=:4444# порт selenium_grid
-selector=/wd/hub# адресная строка для selenium_grid
+number_test=1  # кол-во random тестов (запускаются на Chrome, Edge, Firefox)
+url_selenium_grid=<ip-address>  # url адресс selenium grid  
+port_selenium_grid=:4444  # порт selenium_grid
+selector=/wd/hub  # адресная строка для selenium_grid
 # все вместе получится 
-# http://<ip-address>:port/wd/hub
+# <ip-address>:port/wd/hub
 ```
 
 Запускаем selenium-grid через docker compose:
 
 ```bash
-docker-compose -f ./docker-compose-selenium.yml up
+docker-compose -f docker-compose-selenium.yml up
 ```
 * Команда `docker compose`(раздельно) используется в новых версиях Докера, в старых, необходимо использовать `docker-compose`(через дефис)
 
@@ -99,16 +99,16 @@ docker-compose -f ./docker-compose-selenium.yml up
 
 ### 3.3) Запуск тестов, создание отчетов и selenium grid будет запускаться через Docker.<a id='step_3_3'></a>
 
-#### !!! Подразумевается что вы уже находитесь в папке с проектом. Если это не так, перейдите в [Пункт №2](#STEP_TWO) 
+!!! Подразумевается что вы уже находитесь в папке с проектом. Если это не так, выполните
+[Пункт1](#STEP_ONE) и [Пункт №2](#STEP_TWO) 
 
 Настраиваем файл `all.env`
 ```dotenv
-number_test=1# кол-во random тестов (запускаются на Chrome, Edge, Firefox)
-port_selenium_grid=:4444
-selector=/wd/hub# вход для selenium_grid
+number_test=1  # кол-во random тестов (запускаются на Chrome, Edge, Firefox)
+port_selenium_grid=4444
 ```
-port_selenium_grid, меняем если порт занят другой программой.
-<br>обратите внимание: url_selenium_grid убран.
+* port_selenium_grid, меняем если порт занят другой программой.
+* обратите внимание: url_selenium_grid и selector для точки ввхода убраны.
 
 ##### Запуск docker-compose: 
 ```bash
