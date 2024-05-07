@@ -2,7 +2,7 @@
 
 ### Установка
 ### Пункт 1. 
-Cкачать проект в локальную директорию. В текущей директории будет создана папка `test_case_simbirsoft`
+Скачать проект в локальную директорию. В текущей директории будет создана папка `test_case_simbirsoft`
 
 ```bash
 git clone https://github.com/Jugern/Pytest-Selenium-Allure.git
@@ -19,7 +19,7 @@ cd test_case_simbirsoft
 3) `Pytest`, `Allure` и `Selenium grid` [будут запущены через Docker](#step_3_3)
 ___
 
-### 3.1) Запуск тестов локально с предустановлеными программами.<a id='step_3_1'></a>
+### 3.1) Запуск тестов локально с предустановленными программами.<a id='step_3_1'></a>
     
 Создайте виртуальное окружение и активируйте его,
 потом обновить pip и установить зависимости:
@@ -42,10 +42,10 @@ sudo chmod +x ./wait-for-it.sh
 #### Настраиваем конфигурацию тестов<a id='config'></a>
 Открываем файл `.env` и прописываем параметры.
 ```dotenv
-number_test=1  # кол-во random тестов (запускаются на Chrome, Edge, Firefox)
-url_selenium_grid=http://<ip-address>  # url адресс selenium grid  
-port_selenium_grid=:4444  # порт selenium_grid
-selector=/wd/hub  # адресная строка для selenium_grid
+number_test=1# кол-во random тестов (запускаются на Chrome, Edge, Firefox)
+url_selenium_grid=http://<ip-address># url адресс selenium grid  
+port_selenium_grid=:4444# порт selenium_grid
+selector=/wd/hub# адресная строка для selenium_grid
 # все вместе получится 
 # http://<ip-address>:port/wd/hub
 ```
@@ -61,12 +61,11 @@ selector=/wd/hub  # адресная строка для selenium_grid
 ```bash
 pytest -sv
 ```
-
 2. Генерация готового отчета выполняется командой:
 ```bash
 allure generate --clean
 ```
-3. Открываем сгенерированый отчет командой
+3. Открываем сгенерированный отчет командой
 ```
 allure open 
 ````
@@ -81,10 +80,10 @@ ___
 
 Настраиваем файл `.env`.
 ```dotenv
-number_test=1  # кол-во random тестов (запускаются на Chrome, Edge, Firefox)
-url_selenium_grid=http://<ip-address>  # url адресс selenium grid  
-port_selenium_grid=:4444  # порт selenium_grid
-selector=/wd/hub  # адресная строка для selenium_grid
+number_test=1# кол-во random тестов (запускаются на Chrome, Edge, Firefox)
+url_selenium_grid=http://<ip-address># url адресс selenium grid  
+port_selenium_grid=:4444# порт selenium_grid
+selector=/wd/hub# адресная строка для selenium_grid
 # все вместе получится 
 # http://<ip-address>:port/wd/hub
 ```
@@ -104,16 +103,26 @@ docker-compose -f ./docker-compose-selenium.yml up
 
 Настраиваем файл `all.env`
 ```dotenv
-number_test=1  # кол-во random тестов (запускаются на Chrome, Edge, Firefox)
-port_selenium_grid=:4444  # порт для selenium_grid
-selector=/wd/hub  # вход для selenium_grid
-# обратите внимание: url_selenium_grid убран.
+number_test=1# кол-во random тестов (запускаются на Chrome, Edge, Firefox)
+port_selenium_grid=:4444
+selector=/wd/hub# вход для selenium_grid
 ```
+port_selenium_grid, меняем если порт занят другой программой.
+<br>обратите внимание: url_selenium_grid убран.
 
 ##### Запуск docker-compose: 
 ```bash
-docker-compose -f ./docker-compose-all.yml up
+docker-compose -f docker-compose-all.yml up
 ```
-После инициализации и прохождения всех тестов, отчет будет доступен по адресу http://localhost:5252
+Или с флагом `-d` для запуска в фоновом режиме
+```bash
+docker-compose -f docker-compose-all.yml up -d 
+```
+После инициализации и прохождения всех тестов, отчет будет доступен по адресу http://localhost:9999
+
+Остановить контейнеры можно командой:
+```bash
+docker-compose -f docker-compose-all.yml down 
+```
 ___
 
