@@ -2,7 +2,7 @@
 
 ### Установка
 ### Пункт 1.<a id='STEP_ONE'></a>
-Скачать проект в локальную директорию. В текущей директории будет создана папка `test_case_simbirsoft`
+Скачать проект в локальную директорию. В текущей директории будет создана папка `Pytest-Selenium-Allure`
 
 ```bash
 git clone https://github.com/Jugern/Pytest-Selenium-Allure.git
@@ -11,7 +11,7 @@ git clone https://github.com/Jugern/Pytest-Selenium-Allure.git
 ### Пункт 2.<a id='STEP_TWO'></a>
 Перейдите в папку с проектом:
 ```bash
-cd test_case_simbirsoft
+cd Pytest-Selenium-Allure
 ```
 ### Далее есть 3 варианта запуска тестов.
 1) `Pytest`, `Allure` и `Selenium grid` [установлены локально на компьютере](#step_3_1)
