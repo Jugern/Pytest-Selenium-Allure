@@ -21,7 +21,6 @@ else:
     url_selenium_grid = getenv('url_selenium_grid')
     port_selenium_grid = getenv('port_selenium_grid')
     selector_selenium_grid = getenv('selector')
-print(f"http://{url_selenium_grid}:{port_selenium_grid}{selector_selenium_grid}")
 
 @allure.epic("Start browser driver.")
 @pytest.fixture(scope="function")
