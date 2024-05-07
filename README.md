@@ -43,11 +43,11 @@ sudo chmod +x ./wait-for-it.sh
 Открываем файл `.env` и прописываем параметры.
 ```dotenv
 number_test=1  # кол-во random тестов (запускаются на Chrome, Edge, Firefox)
-url_selenium_grid=http://<ip-address>  # url адресс selenium grid  
-port_selenium_grid=:4444  # порт selenium_grid
+url_selenium_grid=<ip-address>  # url адресс selenium grid  
+port_selenium_grid=4444  # порт selenium_grid
 selector=/wd/hub  # адресная строка для selenium_grid
 # все вместе получится 
-# http://<ip-address>:port/wd/hub
+# <ip-address>:port/wd/hub
 ```
 [//]: # (Для ускорения выполнения тестов, а так же для запуска тестов в docker контейнере или CI/CD нужно отключить `headless` режим. Для это нужно раскомментировать следующую строчку `# options.add_argument&#40;"--headless"&#41;` в файле `conftest.py`)
 
@@ -56,16 +56,18 @@ selector=/wd/hub  # адресная строка для selenium_grid
 
 ### Запуск тестов
 
-1. Так как в `pytest.ini` прописана команда `--alluredir=allure-results` 
+1) Так как в `pytest.ini` прописана команда `--alluredir=allure-results` 
 запуск тестов выгрузкой файлов для allure-отчета производится без дополнительных передач аргументов:
 ```bash
-pytest -sv
+ pytest -sv
 ```
-2. Генерация готового отчета выполняется командой:
+
+Отчет сгенерировать можно как через командную строку, так и сгенерировать через docker.
+2) Генерация готового отчета выполняется командой:
 ```bash
-allure generate --clean
+ allure generate --clean
 ```
-3. Открываем сгенерированный отчет командой
+3) Открываем сгенерированный отчет командой
 ```
 allure open 
 ````
@@ -73,7 +75,46 @@ allure open
 <br>Переходим на данный адрес, получаем отчет тестирования.
 ___
 
-### 3.2) Запуск тестов и создание отчетов будет локально, <br>selenium grid будет запускаться через Docker.<a id='step_3_2'></a>
+Если хотим сгенерировать отчет через Docker контейнер.
+
+На Linux
+```bash
+ docker run -p 5050:5050 -e CHECK_RESULTS_EVERY_SECONDS=3 -e KEEP_HISTORY=1 \
+ -v ${PWD}/allure-results:/app/allure-results \
+ -v ${PWD}/allure-reports:/app/default-reports \
+ frankescobar/allure-docker-service
+```
+```bash
+ docker run -p 5252:5252 -e ALLURE_DOCKER_PUBLIC_API_URL=http://localhost:5050 \
+ frankescobar/allure-docker-service-ui
+```
+На Windows
+```bash
+ docker run -p 5050:5050 -e CHECK_RESULTS_EVERY_SECONDS=3 -e KEEP_HISTORY=1 \
+ -v "/$(pwd)/allure-results:/app/allure-results" \
+ -v "/$(pwd)/allure-reports:/app/default-reports" \
+ frankescobar/allure-docker-service
+```
+```bash
+ docker run -p 5252:5252 -e ALLURE_DOCKER_PUBLIC_API_URL=http://localhost:5050 \
+ frankescobar/allure-docker-service-ui
+```
+
+* В случае ошибки `Permission denied` --> [issue #108](https://github.com/fescobar/allure-docker-service#known-issues)
+<br>Docker контейнеры запускаются через дополнительный аргумент `--user="$(id -u):$(id -g)`
+
+```bash
+ docker run --user="$(id -u):$(id -g)" -p 5050:5050 -e CHECK_RESULTS_EVERY_SECONDS=3 -e KEEP_HISTORY="TRUE" \
+ -v ${PWD}/allure-results:/app/allure-results \
+ -v ${PWD}/allure-reports:/app/default-reports \
+ frankescobar/allure-docker-service
+```
+```bash
+ docker run -p 5252:5252 -e ALLURE_DOCKER_PUBLIC_API_URL=http://localhost:5050 \
+ frankescobar/allure-docker-service-ui
+```
+
+### 3.2) Запуск тестов и создание отчетов будет локально,<br>selenium grid будет запускаться через Docker.<a id='step_3_2'></a>
  
 !!! Подразумевается что вы уже находитесь в папке с проектом. Если это не так, выполните
 [Пункт1](#STEP_ONE) и [Пункт №2](#STEP_TWO) 
