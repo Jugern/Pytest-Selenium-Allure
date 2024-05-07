@@ -2,6 +2,7 @@
 venv
 __pycache__
 .github
+.idea
 .pytest_cache
 allure-reports
 allure-results
