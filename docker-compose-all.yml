@@ -1,25 +1,6 @@
 version: '3'
 
 services:
-  allure:
-    image: "frankescobar/allure-docker-service"
-    environment:
-      CHECK_RESULTS_EVERY_SECONDS: 1
-      KEEP_HISTORY: 1
-    ports:
-      - "5050:5050"
-    volumes:
-      - ${PWD}/allure-results:/app/allure-results
-      - ${PWD}/allure-reports:/app/default-reports
-
-  allure-ui:
-    image: "frankescobar/allure-docker-service-ui"
-    environment:
-      ALLURE_DOCKER_PUBLIC_API_URL: "http://localhost:5050"
-      ALLURE_DOCKER_PUBLIC_API_URL_PREFIX: ""
-    ports:
-      - "5252:5252"
-
   chrome:
     image: selenium/node-chrome:4.20.0-20240425
     shm_size: 1gb
@@ -67,12 +48,17 @@ services:
       - ${port_selenium_grid}:4444
 
   pytest:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: pytest
-    command: ./wait-for-it.sh   selenium-hub:${port_selenium_grid} -- pytest -sv
     env_file:
       - all.env
+    ports:
+      - 9999:9999
     volumes:
+      - ${PWD}/allure-results:/app/allure-results
+      - ${PWD}/allure-reports:/app/default-reports
       - .:/usr/src/app
     depends_on:
       - selenium-hub
