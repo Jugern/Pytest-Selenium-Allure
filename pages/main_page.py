@@ -1,15 +1,26 @@
-from .base_page import BasePage
-from .locators import LoginPageLocators, MainPageLocators, DepositPageLocators, \
-    WithDrawPageLocators, TransactionPageLocators
+import os.path
+import time
 
-import time, csv, allure
-from datetime import datetime
-from selenium.webdriver.support import expected_conditions as EC
+import allure
+from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import Select
+
+from .base_page import BasePage
+from .locators import (LoginPageLocators,
+                       MainPageLocators,
+                       DepositLocators,
+                       WithDrawLocators,
+                       TransactionPageLocators,
+                       )
 
 
 class MainPage(BasePage):
-    """"""
+    """
+    Открывает главную страницу.
+    Проверяет нахождение кнопки логина.
+    Выбирает пользователя.
+    Переходит на страницу главной панели.
+    """
 
     @allure.step("Проверяем, что ссылка логина есть")
     def should_be_login_link(self):
@@ -29,90 +40,115 @@ class MainPage(BasePage):
     def go_to_panel(self):
         self.browser.find_element(*LoginPageLocators.LOGIN_CLICK_BUTTON).click()
 
+
+class DepositPage(BasePage):
+    """
+    Производит пополнение баланса на счет
+
+    Methods:
+        put_a_deposit(number): пополняет баланс на сумму number
+        balance_after_depositing(): проверяет, что сумма пополнилась
+
+    """
     @allure.step('Пополняем баланс на сумму "Фибоначи"')
-    def put_a_deposit(self):
-        self.browser.find_element(*DepositPageLocators.DEPOSIT_BUTTON).click()
-        self.browser.find_element(*DepositPageLocators.DEPOSIT_AMOUNT).send_keys(self.fib_sum)
+    def put_a_deposit(self, number):
+        self.await_browser.until(ec.visibility_of_element_located(DepositLocators.DEPOSIT_BUTTON)).click()
+        self.await_browser.until(ec.visibility_of_element_located(DepositLocators.DEPOSIT_FORM))
+        self.await_browser.until(ec.visibility_of_element_located(DepositLocators.DEPOSIT_AMOUNT)).send_keys(number)
         time.sleep(0.5)
-        self.browser.find_element(*DepositPageLocators.DEPOSIT_CLICK).click()
+        self.browser.find_element(*DepositLocators.DEPOSIT_CLICK).click()
+        self.utility.deposit(number)
         time.sleep(0.5)
-        self.await_browser.until(EC.text_to_be_present_in_element(MainPageLocators.BALLANCE_BANK, str(self.fib_sum)))
 
     @allure.step("Проверяем, что сумма пополнилась")
     def balance_after_depositing(self):
-        assert self.browser.find_element(*MainPageLocators.BALLANCE_BANK).text == str(self.fib_sum), \
-            "Депозит не совпадает с заданным значением суммы Фибоначчи"
-        assert self.browser.find_element(*DepositPageLocators.DEPOSIT_SUCCESS).text == "Deposit Successful", \
+        assert self.browser.find_element(*MainPageLocators.BALANCE_BANK).text == str(self.utility.start_number), \
+            "После внесения депозита сумма не совпадает с итоговой суммой."
+        assert self.browser.find_element(*DepositLocators.DEPOSIT_SUCCESS).text == "Deposit Successful", \
             "Нет надписи об успешном пополнение депозита"
 
+
+class WithdrawPage(BasePage):
+    """
+    Производит вывода средств со счета
+
+    Methods:
+        put_a_withdraw(number): выводит средства со счета на сумму number
+        balance_after_withdraw(): проверяет, что сумма убавилась на number и равна self.utility.start_number
+
+    """
+
     @allure.step('Убавляем баланс на сумму "Фибоначи"')
-    def put_a_withdraw(self):
-        self.await_browser.until(EC.visibility_of_element_located(WithDrawPageLocators.WITHDRAW_BUTTON)).click()
-        self.await_browser.until(EC.visibility_of_element_located(WithDrawPageLocators.WITHDRAW_FORM))
-        self.await_browser.until(EC.visibility_of_element_located(WithDrawPageLocators.WITHDRAW_AMOUNT))\
-            .send_keys(self.fib_sum)
+    def put_a_withdraw(self, number):
+        self.await_browser.until(ec.visibility_of_element_located(WithDrawLocators.WITHDRAW_BUTTON)).click()
+        self.await_browser.until(ec.visibility_of_element_located(WithDrawLocators.WITHDRAW_FORM))
+        self.await_browser.until(ec.visibility_of_element_located(WithDrawLocators.WITHDRAW_AMOUNT))\
+            .send_keys(number)
         time.sleep(0.5)
-        self.await_browser.until(EC.visibility_of_element_located(WithDrawPageLocators.WITHDRAW_CLICK)).click()
+        self.await_browser.until(ec.visibility_of_element_located(WithDrawLocators.WITHDRAW_CLICK)).click()
+        self.utility.withdraw(number)
         time.sleep(0.5)
 
     @allure.step("Проверяем, что сумма убавилась и равна 0")
     def balance_after_withdraw(self):
-        assert self.browser.find_element(*MainPageLocators.BALLANCE_BANK).text == "0", \
-            "Сумма на счету не равна нулю"
-        assert self.browser.find_element(*WithDrawPageLocators.WITHDRAW_SUCCESS).text == "Transaction successful", \
+        assert self.browser.find_element(*MainPageLocators.BALANCE_BANK).text == str(self.utility.start_number), \
+            "Сумма после вывода не совпадает с итоговой суммой."
+        assert self.browser.find_element(*WithDrawLocators.WITHDRAW_SUCCESS).text == "Transaction successful", \
             "Нет надписи об успешном снятии средств"
+
+
+class TransacPage(BasePage):
+    """
+    Производит переход на страницу транзакций и преобразовывает транзакции в таблицу.
+
+    Methods:
+        go_to_transactions_page(): переходим на страницу транзакций
+        converting_transactions(): преобразовывает транзакции в таблицу
+        check_transactions(): проверяет, что транзакции преобразованы в таблицу
+
+    """
 
     @allure.step("Переходим на страницу транзакций")
     def go_to_transactions_page(self):
+        assert self.browser.find_element(*MainPageLocators.BALANCE_BANK).text == str(self.utility.start_number), \
+            "Сумма после всех транзакций не совпадает с итоговой суммой."
         self.browser.find_element(*TransactionPageLocators.TRANSACTIONS_BUTTON).click()
-        self.table = self.browser.find_element(*TransactionPageLocators.TRANSACTIONS_TABLE)
-        if not self.table.text:
+        self.utility.table = self.browser.find_element(*TransactionPageLocators.TRANSACTIONS_TABLE)
+        if not self.utility.table.text:
             self.page_back_next(TransactionPageLocators.TRANSACTIONS_BACK_BUTTON,
                                 TransactionPageLocators.TRANSACTIONS_BUTTON,
                                 TransactionPageLocators.TRANSACTIONS_TABLE)
-            self.table = self.browser.find_element(*TransactionPageLocators.TRANSACTIONS_TABLE)
+            self.utility.table = self.browser.find_element(*TransactionPageLocators.TRANSACTIONS_TABLE)
 
     @allure.step("Проверяем, что транзакции преобразованы")
     def converting_transactions(self):
-        spisok = self.check_table(TransactionPageLocators.TRANSACTIONS_TABLE)
-        if not spisok:
-            assert False, "Транзакции не записаны в таблицу"
-        data_time_credit = datetime.strptime(spisok[0], "%B %d, %Y %I:%M:%S %p")
-        amount_credit = spisok[1]
-        trans_type_credit = spisok[2]
-        data_time_debit = datetime.strptime(spisok[3], "%B %d, %Y %I:%M:%S %p")
-        amount_debit = spisok[4]
-        trans_type_debit = spisok[5]
-        self.dict_csv = {
-            'creadit': [data_time_credit, amount_credit, trans_type_credit],
-            'debit': [data_time_debit, amount_debit, trans_type_debit]
-        }
+        trans_table = self.converting_table()
+        assert trans_table, "Транзакции не записаны в таблицу"
+        assert len(trans_table) == self.utility.get_all_actions(), "Количество транзакции не совпадает"
+        self.utility.create_table(trans_table)
 
-    @allure.step("Проверяем, что транзакции есть")
-    def check_transactions(self):
-        assert len(self.dict_csv) == 2, "Транзакции не совпадают"
-        assert self.dict_csv['creadit'][1] == self.dict_csv['debit'][1], \
-            "Транзакции не совпадают по сумме"
-        assert self.dict_csv['creadit'][2] == "Credit", "Транзакция Credit не совершена"
-        assert self.dict_csv['debit'][2] == "Debit", "Транзакция Debit не совершена"
+
+class AllureReport(BasePage):
+    """
+    Сохраняем транзакции в файл и передаем его в отчет allure
+
+    Methods:
+        create_transaction_file(file_name): сохраняем транзакцию в файл
+        attach_transaction_file(): прикрепляем файл в отчет allure
+        clear_data(): очищаем все данные после создания отчета
+
+    """
 
     @allure.step("Сохраняем транзакцию в файл")
-    def create_transaction_file(self):
-        with open('transactions.csv', 'w', newline='', encoding='utf-8') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(['Дата-времяТранзакции', 'Сумма', 'ТипТранзакции'])
-            for transaction_type, transaction_data in self.dict_csv.items():
-                date_time = transaction_data[0].strftime("%d %B %Y %H:%M:%S")
-                amount = transaction_data[1]
-                transaction_type = transaction_data[2]
-                writer.writerow([date_time, amount, transaction_type])
+    def create_transaction_file(self, file_name):
+        file_name = self.utility.create_csv_file(file_name)
+        assert os.path.isfile(file_name), "CSV файла не создался"
 
     @allure.step("Загружаем транзакцию из файла в отчет allure")
     def attach_transaction_file(self):
-        csv_file_path = 'transactions.csv'
+        csv_file_path = self.utility.get_filename()
         allure.attach.file(csv_file_path, name="transactions.csv", attachment_type=allure.attachment_type.CSV)
 
-
-
-
-
+    def clear(self):
+        """ Очищение данных """
+        self.clear_data()

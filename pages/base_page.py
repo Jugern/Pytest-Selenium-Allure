@@ -1,89 +1,99 @@
 import allure
-import datetime
-
-from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from typing import Any, Union
+
+from .utility import Utility
 
 
 class BasePage:
+    """
+    Класс для работы со страницей
+
+    Attributes:
+        browser (selenium.webdriver): Драйвер браузера
+        url (str): URL адрес для открываемой страницы
+        await_browser (webdriver.support.ui.WebDriverWait): Ожидание элемента (10 секунд)
+        utility (Utility): инициализация singleton где хранятся методы и атрибуты для работы с данными
+
+    """
 
     def __init__(self, browser, url, timeout=10):
+        super().__init__()
         self.browser = browser
         self.url = url
         self.browser.implicitly_wait(timeout)
         self.await_browser = WebDriverWait(self.browser, timeout)
-        self.fib_sum = self.chislo_fibonaci()
-        self.table = None  # данные по всей таблице
-        self.dict_csv = dict()  # словарь для сохранения в формате csv
-
-    def chislo_fibonaci(self) -> int:
-        fib1 = fib2 = 1
-        n = datetime.datetime.now().day - 1
-        while n > 0:
-            fib1, fib2 = fib2, fib1 + fib2
-            n -= 1
-        return fib2
+        self.utility = Utility()
 
     @allure.step('Открываем страницу')
     def open(self) -> None:
+        """ Открывает страницу url"""
         self.browser.get(self.url)
 
     def is_element_present(self, how, what) -> bool:
+        """ Проверяет наличие элемента на странице
+
+        Args:
+            how (webdriver.support.ui.By): Определение элемента (xpath, css, id, name)
+            what (str): Имя элемента для поиска
+
+        Returns:
+            bool: Проверка наличия элемента True или False
+
+        """
         try:
             self.browser.find_element(how, what)
         except NoSuchElementException:
             return False
         return True
 
-    def await_element_present(self, how, what) -> None:
-        # Метод для проверки наличия элемента на странице через значения параметров
-        self.browser.until(EC.visibility_of_element_located((how, what)))
-
     def check_selector(self, selector: tuple) -> None:
-        # Метод для проверки наличия элемента на странице через кортеж
-        self.await_browser.until(EC.visibility_of_element_located(selector))
+        """ Метод для проверки наличия элемента на странице через кортеж
+
+        Args:
+            selector (tuple): Определение элемента (xpath, css, id, name) и имя элемента
+
+        """
+        self.await_browser.until(ec.visibility_of_element_located(selector))
 
     def page_back_next(self, selector_back: tuple, selector_next: tuple, table: tuple) -> None:
-        # Метод для проверки наличия данных в таблице, если нет,
-        # то переходим на предыдущую страницу с возвратом на страницу.
+        """Метод для проверки наличия данных в таблице, если нет,
+        то переходим на предыдущую страницу с возвратом на страницу.
+
+        Args:
+            selector_back (tuple): Определение элемента (xpath, css, id, name) и имя элемента для перехода назад
+            selector_next (tuple): Определение элемента (xpath, css, id, name) и имя элемента для перехода вперед
+            table (tuple): Определение элемента (xpath, css, id, name) и имя элемента для таблицы
+
+        """
         i = 18
         while i:
-            if not self.table.text:
-                self.await_browser.until(EC.element_to_be_clickable(selector_back)).click()
-                self.await_browser.until(EC.element_to_be_clickable(selector_next)).click()
-                self.table = self.await_browser.until(EC.visibility_of_element_located(table))
+            if not self.utility.table.text:
+                self.await_browser.until(ec.element_to_be_clickable(selector_back)).click()
+                self.await_browser.until(ec.element_to_be_clickable(selector_next)).click()
+                self.utility.table = self.await_browser.until(ec.visibility_of_element_located(table))
                 i -= 1
             else:
                 i = 0
 
-    def converting_table(self) -> list():
-        # Метод для конвертации таблицы в список значений
-        # Ожидаем:
-        #   1 значение: дата, 2 значение: сумма, 3 значение: Дебит или Кредит
-        #   4 значение: дата, 5 значение: сумма, 6 значение: Дебит или Кредит
-        table = self.table
+    def converting_table(self) -> list:
+        """ Метод конвертирует таблицу в список
+
+        Returns:
+            list: Возвращает список из таблицы транзакций в виде [[первая транзакция], [вторая транзакция], и т.д.]
+
+        """
+        table = self.utility.table
         convert = list()
-        for i in table.find_elements(By.TAG_NAME, "td"):
-            convert.append(i.text)
+        for j in table.find_elements(By.TAG_NAME, "tr"):
+            value_row = list()
+            for i in j.find_elements(By.TAG_NAME, "td"):
+                value_row.append(i.text)
+            convert.append(value_row)
         return convert
 
-    def check_table(self, transactions_table: tuple) -> list[Union[str, int]]:
-        # Метод преобразования список значений в словарь для сохранения в формате csv
-        i = 5
-        spisok = self.converting_table()
-        while i:
-            if len(spisok) != 6:
-                self.table = self.await_browser.until(EC.visibility_of_element_located(
-                    transactions_table))
-                spisok = self.converting_table()
-                i -= 1
-            else:
-                return spisok
-        return list()
-
-
-
-
+    def clear_data(self) -> None:
+        """ Метод для очистки данных в Singleton"""
+        Utility.delete_instance()

@@ -1,5 +1,3 @@
-from typing import Tuple
-
 from selenium.webdriver.common.by import By
 
 
@@ -7,60 +5,44 @@ class LoginPageLocators:
     """
     Здесь хранятся локаторы для страницы логина
     """
-    LOGIN_LINK = (By.CSS_SELECTOR,
-                  "body > div > div > div.ng-scope > div > div.borderM.box.padT20 > div:nth-child(1) > button")
+    LOGIN_LINK = (By.XPATH, '//button[text()="Customer Login"]')
     SELECT_USER = (By.CSS_SELECTOR, "#userSelect")
-    LOGIN_CLICK_BUTTON = (By.CSS_SELECTOR, "body > div > div > div.ng-scope > div > form > button")
+    LOGIN_CLICK_BUTTON = (By.XPATH, '//button[text()="Login"]')
 
 
 class MainPageLocators:
     """
     Здесь хранятся локаторы для главной панели
     """
-    BALLANCE_BANK = (By.CSS_SELECTOR, "body > div > div > div.ng-scope > div > div:nth-child(3) > strong:nth-child(2)")
-    TRANSACTIONS_BUTTON = (By.CSS_SELECTOR,
-                           "body > div > div > div.ng-scope > div > div:nth-child(5) > button:nth-child(1)")
+    BALANCE_BANK = (By.XPATH, "//div[@class='center']/strong[2]")
 
 
-class DepositPageLocators:
+class DepositLocators:
     """
-    Здесь хранятся локаторы для взаимодействия с пополнением стредств
+    Здесь хранятся локаторы для взаимодействия с пополнением средств
     """
-    DEPOSIT_BUTTON = (By.CSS_SELECTOR,
-                      "body > div > div > div.ng-scope > div > div:nth-child(5) > button:nth-child(2)")
-    DEPOSIT_FORM = (By.CSS_SELECTOR,
-                    'form[ng-submit="deposit()"]')
-    DEPOSIT_AMOUNT = (By.CSS_SELECTOR,
-                      "div > div.container-fluid.mainBox.ng-scope > div > form > div > input")
-    DEPOSIT_CLICK = (By.CSS_SELECTOR,
-                     "div > div.container-fluid.mainBox.ng-scope > div > form > button")
-    DEPOSIT_SUCCESS = (By.CSS_SELECTOR,
-                       "div > div.container-fluid.mainBox.ng-scope > div > span")
+    DEPOSIT_BUTTON = (By.XPATH, '//button[@ng-click="deposit()"]')
+    DEPOSIT_FORM = (By.CSS_SELECTOR, 'form[ng-submit="deposit()"]')
+    DEPOSIT_AMOUNT = (By.XPATH, '//form[@name="myForm"]//input[@placeholder="amount"]')
+    DEPOSIT_CLICK = (By.XPATH, '//form[@name="myForm"]/button[text()="Deposit"]')
+    DEPOSIT_SUCCESS = (By.XPATH, '//div[@class="ng-scope"]/span[@ng-show="message"]')
 
 
-class WithDrawPageLocators:
+class WithDrawLocators:
     """
-    Здесь хранятся локаторы для взаимодействия с выводом стредств
+    Здесь хранятся локаторы для взаимодействия с выводом средств
     """
-    WITHDRAW_BUTTON = (By.CSS_SELECTOR,
-                       "body > div > div > div.ng-scope > div > div:nth-child(5) > button:nth-child(3)")
-    WITHDRAW_FORM = (By.CSS_SELECTOR,
-                    'form[ng-submit="withdrawl()"]')
-    WITHDRAW_AMOUNT = (By.CSS_SELECTOR,
-                       'div.ng-scope > div > div.container-fluid.mainBox.ng-scope > div > form > div > input')
-    WITHDRAW_CLICK = (By.CSS_SELECTOR,
-                      "div.ng-scope > div > div.container-fluid.mainBox.ng-scope > div > form > button")
-    WITHDRAW_SUCCESS = (By.CSS_SELECTOR,
-                        "div.ng-scope > div > div.container-fluid.mainBox.ng-scope > div > span")
+    WITHDRAW_BUTTON = (By.XPATH, '//button[@ng-click="withdrawl()"]')
+    WITHDRAW_FORM = (By.CSS_SELECTOR, 'form[ng-submit="withdrawl()"]')
+    WITHDRAW_AMOUNT = (By.XPATH, '//form[@name="myForm"]//input[@placeholder="amount"]')
+    WITHDRAW_CLICK = (By.XPATH, '//form[@name="myForm"]//button[text()="Withdraw"]')
+    WITHDRAW_SUCCESS = (By.XPATH, '//div[@class="ng-scope"]/span[@ng-show="message"]')
 
 
 class TransactionPageLocators:
     """
     Здесь хранятся локаторы для взаимодействия с таблицей транзакций
     """
-    TRANSACTIONS_BUTTON = (By.CSS_SELECTOR,
-                           "body > div > div > div.ng-scope > div > div:nth-child(5) > button:nth-child(1)")
-    TRANSACTIONS_TABLE = (By.CSS_SELECTOR,
-                          "body > div > div > div.ng-scope > div > div:nth-child(2) > table > tbody")
-    TRANSACTIONS_BACK_BUTTON = (By.CSS_SELECTOR,
-                                "body > div > div > div.ng-scope > div > div.fixedTopBox > button:nth-child(1)")
+    TRANSACTIONS_BUTTON = (By.XPATH, '//button[@ng-class="btnClass1"]')
+    TRANSACTIONS_TABLE = (By.XPATH, '//table[@class="table table-bordered table-striped"]/tbody')
+    TRANSACTIONS_BACK_BUTTON = (By.XPATH, '//button[@ng-click="back()"]')

@@ -1,38 +1,25 @@
-import allure
 import random
-import pytest
 
-from dotenv import load_dotenv
-from os import environ, getenv
+import allure
+import pytest
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
 
-# настройка окружения в зависимости от запуска
-if 'url_selenium_grid' in environ:
-    url_selenium_grid = environ.get('url_selenium_grid')
-    port_selenium_grid = environ.get('port_selenium_grid')
-    selector_selenium_grid = environ.get('selector')
-elif 'port_selenium_grid' in environ:
-    url_selenium_grid = 'selenium-hub'
-    port_selenium_grid = environ.get('port_selenium_grid')
-    selector_selenium_grid = '/wd/hub'
-else:
-    load_dotenv()
-    url_selenium_grid = getenv('url_selenium_grid')
-    port_selenium_grid = getenv('port_selenium_grid')
-    selector_selenium_grid = getenv('selector')
+from pages.config.settings import Config
+
 
 @allure.epic("Start browser driver.")
 @pytest.fixture(scope="function")
 def browser() -> webdriver:
     """
     Fixture для инициализации драйвера браузера.
-    Возвращает:
+    Если указать в переменной browser при random.choice() передать local_browser_list, то будет локальный запуск.
+
+    Returns:
         WebDriver: Экземпляр драйвера браузера.
-    Вызывает:
-        NotImplementedError: Если указанный браузер не поддерживается.
     """
-    remote_url = f"http://{url_selenium_grid}:{port_selenium_grid}{selector_selenium_grid}"
+
+    remote_url = Config.create_remote_url()
 
     @allure.description("Start local Firefox browser driver.")
     def local_firefox() -> webdriver:
@@ -110,7 +97,7 @@ def browser() -> webdriver:
         driver = webdriver.Remote(command_executor=remote_url, options=options)
         return driver
 
-    local_browser_list = [local_firefox, local_chrome, local_edge, ]
+    # local_browser_list = [local_firefox, local_chrome, local_edge, ]
     docker_browser_list = [docker_firefox, docker_chrome, docker_edge, ]
     browser = random.choice(docker_browser_list)()
     with allure.step(f"Запускается браузер {browser.name}"):
@@ -119,3 +106,12 @@ def browser() -> webdriver:
     with allure.step(f"Браузер {browser.name} закрывается"):
         ...
     browser.quit()
+
+
+@pytest.fixture
+def value_number():
+    """
+    Значение, которое будет передаваться в тестовый метод
+    """
+    number = Config.sum_number_fibonacci()
+    return number
